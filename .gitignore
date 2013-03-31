@@ -167,4 +167,7 @@ pip-log.txt
 #################
 .idea/workspace.xml
 
+out/
+gen/
+
 
