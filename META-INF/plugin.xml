@@ -37,6 +37,9 @@
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
+
+      <fileTypeFactory implementation="com.oscadplugin.OscadFileTypeFactory"/>
+      <lang.parserDefinition language="Oscad" implementationClass="com.oscadplugin.OscadParserDefinition"/>
     <!-- Add your extensions here -->
   </extensions>
 </idea-plugin>
