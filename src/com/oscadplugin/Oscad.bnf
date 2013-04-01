@@ -14,8 +14,94 @@
   tokenTypeClass="com.oscadplugin.psi.OscadTokenType"
 }
 
-simpleFile ::= item_*
+input ::=
+	/* empty */ |
+	COMMENT input |
+	use_or_include  input |
+	statement input
 
-private item_ ::= (property|COMMENT|CRLF)
+use_or_include ::=
+    USE | INCLUDE
 
-property ::= (KEY? SEPARATOR VALUE?) | KEY
+inner_input ::=
+	/* empty */ |
+	statement inner_input
+
+statement ::=
+	SEMICOLON |
+	LEFT_BRACE inner_input RIGHT_BRACE |
+	module_instantiation |
+	ID EQUALS expr SEMICOLON |
+	MODULE ID LEFT_PAREN arguments_decl optional_commas RIGHT_PAREN  statement |
+	FUNCTION ID LEFT_PAREN arguments_decl optional_commas RIGHT_PAREN EQUALS expr SEMICOLON
+
+/* Will return a dummy parent node with zero or more children */
+children_instantiation ::=
+	module_instantiation  |
+	LEFT_BRACE module_instantiation_list RIGHT_BRACE  ;
+
+if_statement ::=
+	IF LEFT_PAREN expr RIGHT_PAREN children_instantiation
+
+ifelse_statement ::=
+	if_statement |
+	if_statement ELSE children_instantiation
+
+module_instantiation ::=
+	MODIFIER module_instantiation |
+	single_module_instantiation SEMICOLON |
+	single_module_instantiation children_instantiation  |
+	ifelse_statement
+
+module_instantiation_list ::=
+	/* empty */ |
+	module_instantiation_list module_instantiation
+
+single_module_instantiation ::=
+	ID LEFT_PAREN arguments_call RIGHT_PAREN
+
+expr ::=
+	TRUE|
+	FALSE |
+	UNDEF |
+	ID |
+	STRING |
+	NUMBER  |
+	LEFT_SQUARE_BRACKET expr COLON expr RIGHT_SQUARE_BRACKET  |
+	LEFT_SQUARE_BRACKET expr COLON expr COLON expr RIGHT_SQUARE_BRACKET  |
+	LEFT_SQUARE_BRACKET optional_commas RIGHT_SQUARE_BRACKET  |
+	LEFT_SQUARE_BRACKET vector_expr optional_commas RIGHT_SQUARE_BRACKET  |
+	expr OPERATOR expr |
+	'+' expr  |
+	'-' expr  |
+	'!' expr |
+	LEFT_PAREN expr RIGHT_PAREN  |
+	expr '?' expr COLON expr  |
+	expr LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET  |
+	ID LEFT_PAREN arguments_call RIGHT_PAREN
+
+optional_commas ::=
+	COMMA optional_commas | ;
+
+vector_expr ::=
+	expr  |
+	vector_expr COMMA optional_commas expr
+
+arguments_decl ::=
+	/* empty */  |
+	argument_decl  |
+	arguments_decl COMMA optional_commas argument_decl
+
+argument_decl ::=
+	ID |
+	ID EQUALS expr
+
+arguments_call ::=
+	/* empty */  |
+	argument_call  |
+	arguments_call COMMA optional_commas argument_call
+
+argument_call ::=
+	expr  |
+	ID EQUALS expr
+

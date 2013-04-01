@@ -22,25 +22,76 @@ VALUE_CHARACTER=[^\n\r\f\\] | "\\"{CRLF} | "\\".
 END_OF_LINE_COMMENT=("#"|"!")[^\r\n]*
 SEPARATOR=[:=]
 KEY_CHARACTER=[^:=\ \n\r\t\f\\] | "\\"{CRLF} | "\\".
+WHITE_SPACE_CHAR=[\ \n\r\t\f]
+MODIFIER="!"|"*"
 
-%state WAITING_VALUE
+%x cond_comment
+%x cond_string
+%x cond_include
+%x cond_use
+
+D=[0-9]
+E=[Ee][+-]?{D}+
 
 %%
 
-<YYINITIAL> {END_OF_LINE_COMMENT}                           { yybegin(YYINITIAL); return OscadTypes.COMMENT; }
+{WHITE_SPACE_CHAR}+  {return TokenType.WHITE_SPACE;}
 
-<YYINITIAL> {KEY_CHARACTER}+                                { yybegin(YYINITIAL); return OscadTypes.KEY; }
+include[ \t\r\n>]*"<"	{ yybegin(cond_include); }
+<cond_include>{
+[^\t\r\n>]*"/"	{ }
+[^\t\r\n>/]+	{ }
+">"		{ yybegin(YYINITIAL); return OscadTypes.INCLUDE; }
+}
 
-<YYINITIAL> {SEPARATOR}                                     { yybegin(WAITING_VALUE); return OscadTypes.SEPARATOR; }
 
-<WAITING_VALUE> {CRLF}                                     { yybegin(YYINITIAL); return OscadTypes.CRLF; }
+"use"[ \t\r\n>]*"<"	{ yybegin(cond_use) ; }
+<cond_use>{
+[^\t\r\n>]+	{ }
+ ">"		{ yybegin(YYINITIAL); return OscadTypes.USE; }
+}
 
-<WAITING_VALUE> {WHITE_SPACE}+                              { yybegin(WAITING_VALUE); return TokenType.WHITE_SPACE; }
+"module"	{ return OscadTypes.MODULE;}
+"function"	{return OscadTypes.FUNCTION;}
+"if"		{return OscadTypes.IF;}
+"else"		{return OscadTypes.ELSE;}
 
-<WAITING_VALUE> {FIRST_VALUE_CHARACTER}{VALUE_CHARACTER}*   { yybegin(YYINITIAL); return OscadTypes.VALUE; }
+"true"		{return OscadTypes.TRUE;}
+"false"		{return OscadTypes.FALSE;}
+"undef"		{return OscadTypes.UNDEF;}
 
-{CRLF}                                                     { yybegin(YYINITIAL); return OscadTypes.CRLF; }
+{D}+{E}? |
+{D}*\.{D}+{E}? |
+{D}+\.{D}*{E}?          {  return OscadTypes.NUMBER; }
+"$"?[a-zA-Z0-9_]+       {  return OscadTypes.ID; }
 
-{WHITE_SPACE}+                                              { yybegin(YYINITIAL); return TokenType.WHITE_SPACE; }
+\"			{ yybegin(cond_string); }
+<cond_string>{
+\\n		|
+\\t		|
+\\r		|
+\\\\	|
+\\\"	|
+[^\\\n\"]+		{  }
+\"			{ yybegin(YYINITIAL);
+			return OscadTypes.STRING; }
+}
 
-.                                                           { return TokenType.BAD_CHARACTER; }
+\/\/[^\n]*\n? |
+"/*" { yybegin(cond_comment); }
+<cond_comment>"*/" {yybegin(YYINITIAL); return OscadTypes.COMMENT;}
+<cond_comment>.|\n {}
+
+"="     { return OscadTypes.EQUALS; }
+
+"<="	|
+">="	|
+"=="	|
+"!="	|
+"&&"	|
+"||"	{return OscadTypes.OPERATOR; }
+
+";"     { return OscadTypes.SEMICOLON; }
+
+YYINITIAL {MODIFIER} {return OscadTypes.MODIFIER;}
+YYINITIAL . { return  TokenType.BAD_CHARACTER;}
