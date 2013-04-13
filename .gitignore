@@ -170,4 +170,6 @@ pip-log.txt
 out/
 gen/
 
+OscadLexer.java
+
 
