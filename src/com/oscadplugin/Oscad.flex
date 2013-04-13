@@ -12,8 +12,6 @@ import com.intellij.psi.TokenType;
 %unicode
 %function advance
 %type IElementType
-%eof{  return;
-%eof}
 
 CRLF= \n|\r|\r\n
 WHITE_SPACE=[\ \t\f]
@@ -25,7 +23,6 @@ KEY_CHARACTER=[^:=\ \n\r\t\f\\] | "\\"{CRLF} | "\\".
 WHITE_SPACE_CHAR=[\ \n\r\t\f]
 MODIFIER="!"|"*"
 
-%x cond_comment
 %x cond_string
 %x cond_include
 %x cond_use
@@ -36,20 +33,25 @@ E=[Ee][+-]?{D}+
 %%
 
 {WHITE_SPACE_CHAR}+  {return TokenType.WHITE_SPACE;}
+\/\/[^\n]*\n? |
+"/*"~"*/" {return OscadTypes.COMMENT;}
 
-include[ \t\r\n>]*"<"	{ yybegin(cond_include); }
-<cond_include>{
-[^\t\r\n>]*"/"	{ }
-[^\t\r\n>/]+	{ }
-">"		{ yybegin(YYINITIAL); return OscadTypes.INCLUDE; }
+"include"[ \t\r\n>]*"<"~">"	{ return OscadTypes.INCLUDE; }
+"use"[ \t\r\n>]*"<"~">"	{ return OscadTypes.USE; }
+
+<YYINITIAL> \"	{ yybegin(cond_string); }
+<cond_string> {
+    \\n		|
+    \\t		|
+    \\r		|
+    \\\\	|
+    \\\"	|
+    [^\\\n\"]+		{  }
+    \"			{ yybegin(YYINITIAL);
+                return OscadTypes.STRING; }
 }
 
-
-"use"[ \t\r\n>]*"<"	{ yybegin(cond_use) ; }
-<cond_use>{
-[^\t\r\n>]+	{ }
- ">"		{ yybegin(YYINITIAL); return OscadTypes.USE; }
-}
+<YYINITIAL> {
 
 "module"	{ return OscadTypes.MODULE;}
 "function"	{return OscadTypes.FUNCTION;}
@@ -60,27 +62,18 @@ include[ \t\r\n>]*"<"	{ yybegin(cond_include); }
 "false"		{return OscadTypes.FALSE;}
 "undef"		{return OscadTypes.UNDEF;}
 
-{D}+{E}? |
-{D}*\.{D}+{E}? |
-{D}+\.{D}*{E}?          {  return OscadTypes.NUMBER; }
+[-+]?{D}+{E}? |
+[-+]?{D}*\.{D}+{E}? |
+[-+]?{D}+\.{D}*{E}?          {  return OscadTypes.NUMBER; }
+
 "$"?[a-zA-Z0-9_]+       {  return OscadTypes.ID; }
 
-\"			{ yybegin(cond_string); }
-<cond_string>{
-\\n		|
-\\t		|
-\\r		|
-\\\\	|
-\\\"	|
-[^\\\n\"]+		{  }
-\"			{ yybegin(YYINITIAL);
-			return OscadTypes.STRING; }
-}
-
-\/\/[^\n]*\n? |
-"/*" { yybegin(cond_comment); }
-<cond_comment>"*/" {yybegin(YYINITIAL); return OscadTypes.COMMENT;}
-<cond_comment>.|\n {}
+"("     { return OscadTypes.LEFT_PAREN; }
+")"     { return OscadTypes.RIGHT_PAREN; }
+"{"     { return OscadTypes.LEFT_BRACE; }
+"}"     { return OscadTypes.RIGHT_BRACE; }
+"["     { return OscadTypes.LEFT_SQUARE_BRACKET; }
+"]"     { return OscadTypes.RIGHT_SQUARE_BRACKET; }
 
 "="     { return OscadTypes.EQUALS; }
 
@@ -91,7 +84,16 @@ include[ \t\r\n>]*"<"	{ yybegin(cond_include); }
 "&&"	|
 "||"	{return OscadTypes.OPERATOR; }
 
-";"     { return OscadTypes.SEMICOLON; }
+"*"     |
+"/"     |
+"+"     |
+"-"     {return OscadTypes.OPERATOR; }
 
-YYINITIAL {MODIFIER} {return OscadTypes.MODIFIER;}
+";"     { return OscadTypes.SEMICOLON; }
+":"     { return OscadTypes.COLON; }
+","     { return OscadTypes.COMMA; }
+
+
+MODIFIER {return OscadTypes.MODIFIER;}
+}
 YYINITIAL . { return  TokenType.BAD_CHARACTER;}
