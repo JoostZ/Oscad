@@ -40,6 +40,8 @@
 
       <fileTypeFactory implementation="com.oscadplugin.OscadFileTypeFactory"/>
       <lang.parserDefinition language="Oscad" implementationClass="com.oscadplugin.OscadParserDefinition"/>
+      <lang.syntaxHighlighterFactory key="Oscad" implementationClass="com.oscadplugin.OscadSyntaxHighlighterFactory"/>
+      <colorSettingsPage implementation="com.oscadplugin.OscadColorSettingsPage"/>
     <!-- Add your extensions here -->
   </extensions>
 </idea-plugin>
