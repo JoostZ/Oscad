@@ -27,7 +27,7 @@ import static com.intellij.openapi.editor.colors.TextAttributesKey.createTextAtt
  */
 public class OscadSyntaxHighlighter extends SyntaxHighlighterBase {
     public static final TextAttributesKey SEPARATOR = createTextAttributesKey("Oscad_SEPARATOR", OPERATION_SIGN);
-    public static final TextAttributesKey KEY = createTextAttributesKey("Oscad_KEY", KEYWORD);
+    public static final TextAttributesKey KEY = createTextAttributesKey("Oscad_KEY", CLASS_NAME);
     public static final TextAttributesKey VALUE = createTextAttributesKey("Oscad_VALUE", STRING);
     public static final TextAttributesKey COMMENT = createTextAttributesKey("Oscad_COMMENT", LINE_COMMENT);
 

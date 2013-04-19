@@ -1,0 +1,160 @@
+{
+  parserClass="com.oscadplugin.parser.OscadParser"
+  stubParserClass="com.oscadplugin.parser.GeneratedParserUtilBase"
+
+  extends="com.intellij.extapi.psi.ASTWrapperPsiElement"
+
+  psiClassPrefix="Oscad"
+  psiImplClassSuffix="Impl"
+  psiPackage="com.oscadplugin.psi"
+  psiImplPackage="com.oscadplugin.psi.impl"
+
+  elementTypeHolderClass="com.oscadplugin.psi.OscadTypes"
+  elementTypeClass="com.oscadplugin.psi.OscadElementType"
+  tokenTypeClass="com.oscadplugin.psi.OscadTokenType"
+
+  tokens=[
+    COMMENT = 'regexp://.*(\n|$)'
+    IMPORT = 'use'
+    MODULE = 'module'
+    FUNCTION = 'function'
+    ASSIGN = 'assign'
+    SCALE = 'regexp:scale|rotate'
+
+    IF = 'if'
+    ELSE = 'else'
+    FOR = 'for'
+
+    MODIFIER = '!'
+
+    LEFT_ANGLE = '<'
+    RIGHT_ANGLE = '>'
+    LEFT_PAREN = '('
+    RIGHT_PAREN = ')'
+    LEFT_BRACE = '{'
+    RIGHT_BRACE = '}'
+    LEFT_SQUARE = '['
+    RIGHT_SQUARE = ']'
+
+    ID='regexp:\p{Alpha}\w*'
+    NUMBER = 'regexp:\d+(\.\d*)?'
+
+    COMPARATOR = '==' // Need to be extended with other comparison operators
+
+    EQUALS = '='
+    COMMA = ','
+    SEMICOLON = ';'
+    COLON = ':'
+    STAR = '*'
+    SLASH = '/'
+    PLUS = '+'
+    MINUS = '-'
+  ]
+}
+
+oscadFile ::= item_*
+
+private item_ ::=
+    use_or_include |
+    module_declaration |
+    function_declaration |
+    statement
+
+use_or_include ::=
+    IMPORT LEFT_ANGLE FILENAME RIGHT_ANGLE
+
+FILENAME ::= ID
+
+statement ::=
+    innerstatement |
+    LEFT_BRACE innerstatement + RIGHT_BRACE
+
+innerstatement ::=
+    assignment SEMICOLON |
+    ifelse_statement |
+    for_loop |
+    assign_statement | renderable_item
+
+renderable_item ::=
+    MODIFIER? transformed_item
+
+transformed_item ::=
+    transform+ LEFT_BRACE renderable_item+ RIGHT_BRACE |
+    transform* transformable_item
+
+transformable_item ::=
+    module_instantiation
+
+transform ::=
+    SCALE LEFT_PAREN arguments_call RIGHT_PAREN
+
+assign_statement ::=
+    ASSIGN LEFT_PAREN assignment ( COMMA assignment)* RIGHT_PAREN
+
+assignment ::= ID EQUALS expr
+
+expr ::=
+    factor plus_expr * |
+    vector
+
+left plus_expr ::= plus_op factor
+private plus_op ::= PLUS | MINUS
+private factor ::= primary mul_expr *
+left mul_expr  ::= mul_op primary
+private mul_op ::= STAR | SLASH
+private primary ::= primary_inner factorial_expr ?
+left factorial_expr ::= '!'
+private primary_inner ::= function_instantiation | literal_expr | ref_expr | paren_expr
+paren_expr ::= LEFT_PAREN expr RIGHT_PAREN {pin=1}
+ref_expr ::= ID
+literal_expr ::= number | string | float
+
+module_declaration ::=
+    MODULE ID LEFT_PAREN arguments_decl  RIGHT_PAREN statement
+
+function_declaration ::=
+    FUNCTION ID LEFT_PAREN arguments_decl RIGHT_PAREN EQUALS expr SEMICOLON
+
+arguments_decl ::=
+    argument? (COMMA argument?)*
+
+argument ::=
+	ID  (EQUALS expr) ?
+
+arguments_call ::=
+    argument_call ? (COMMA argument_call) *
+
+argument_call ::= (ID EQUALS)? expr
+
+optional_commas ::=
+	COMMA*
+
+for_loop ::=
+    FOR LEFT_PAREN iterator (COMMA iterator)* RIGHT_PAREN statement
+
+iterator ::=
+    ID EQUALS range_or_vector
+
+range_or_vector ::=range | vector
+
+range ::=  LEFT_SQUARE expr (COLON expr)?  COLON expr RIGHT_SQUARE
+vector ::=  LEFT_SQUARE expr (COMMA expr) + RIGHT_SQUARE
+
+if_statement ::=
+	IF LEFT_PAREN compare_expression RIGHT_PAREN statement
+
+ifelse_statement ::=
+	if_statement ( ELSE statement ) ?
+
+compare_expression ::=
+    expr COMPARATOR expr
+
+module_instantiation ::=
+	ID LEFT_PAREN arguments_call RIGHT_PAREN SEMICOLON
+
+function_instantiation ::= ID LEFT_PAREN arguments_call RIGHT_PAREN
+
+
+
+
+

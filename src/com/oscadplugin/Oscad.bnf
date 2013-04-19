@@ -14,25 +14,25 @@
   tokenTypeClass="com.oscadplugin.psi.OscadTokenType"
 }
 
-input ::=
-	/* empty */ |
-	COMMENT input |
-	use_or_include  input |
-	statement input
+oscadFile ::= item_*
+
+private item_ ::= (COMMENT |use_or_include |statement)
 
 use_or_include ::=
-    USE | INCLUDE
+    IMPORT LEFT_ANGLE FILENAME RIGHT_ANGLE
 
-inner_input ::=
-	/* empty */ |
-	statement inner_input
+inner_input ::= statement?
+
+module_declaration ::=
+    MODULE ID LEFT_PAREN arguments_decl optional_commas RIGHT_PAREN statement
 
 statement ::=
 	SEMICOLON |
 	LEFT_BRACE inner_input RIGHT_BRACE |
+	module_declaration |
+	function_declaration |
 	module_instantiation |
 	ID EQUALS expr SEMICOLON |
-	MODULE ID LEFT_PAREN arguments_decl optional_commas RIGHT_PAREN  statement |
 	FUNCTION ID LEFT_PAREN arguments_decl optional_commas RIGHT_PAREN EQUALS expr SEMICOLON
 
 /* Will return a dummy parent node with zero or more children */
@@ -66,35 +66,33 @@ expr ::=
 	UNDEF |
 	ID |
 	STRING |
-	NUMBER  |
+	NUMBER |
 	LEFT_SQUARE_BRACKET expr COLON expr RIGHT_SQUARE_BRACKET  |
 	LEFT_SQUARE_BRACKET expr COLON expr COLON expr RIGHT_SQUARE_BRACKET  |
 	LEFT_SQUARE_BRACKET optional_commas RIGHT_SQUARE_BRACKET  |
 	LEFT_SQUARE_BRACKET vector_expr optional_commas RIGHT_SQUARE_BRACKET  |
 	expr OPERATOR expr |
-	'+' expr  |
-	'-' expr  |
-	'!' expr |
-	LEFT_PAREN expr RIGHT_PAREN  |
-	expr '?' expr COLON expr  |
-	expr LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET  |
-	ID LEFT_PAREN arguments_call RIGHT_PAREN
+//	'+' expr  |
+//	'-' expr  |
+//	'!' expr |
+//	LEFT_PAREN expr RIGHT_PAREN  |
+//	expr '?' expr COLON expr  |
+//	expr LEFT_SQUARE_BRACKET expr RIGHT_SQUARE_BRACKET  |
+//	ID LEFT_PAREN arguments_call RIGHT_PAREN
 
 optional_commas ::=
-	COMMA optional_commas | ;
+	COMMA*
 
 vector_expr ::=
 	expr  |
 	vector_expr COMMA optional_commas expr
 
 arguments_decl ::=
-	/* empty */  |
-	argument_decl  |
-	arguments_decl COMMA optional_commas argument_decl
+    argument? (COMMA argument)*
 
-argument_decl ::=
+argument ::=
 	ID |
-	ID EQUALS expr
+	ID EQUALS NUMBER
 
 arguments_call ::=
 	/* empty */  |

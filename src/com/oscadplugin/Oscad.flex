@@ -32,13 +32,19 @@ E=[Ee][+-]?{D}+
 
 %%
 
-{WHITE_SPACE_CHAR}+  {return TokenType.WHITE_SPACE;}
 \/\/[^\n]*\n? |
 "/*"~"*/" {return OscadTypes.COMMENT;}
 
-"include"[ \t\r\n>]*"<"~">"	{ return OscadTypes.INCLUDE; }
-"use"[ \t\r\n>]*"<"~">"	{ return OscadTypes.USE; }
+"include" |
+"use"       {yybegin(cond_include); return OscadTypes.IMPORT; }
+<cond_include> {
+{WHITE_SPACE_CHAR}+  {}
+    "<"         { return OscadTypes.LEFT_ANGLE; }
+    [^\n><]*     { return OscadTypes.FILENAME; }
+    ">"         { yybegin(YYINITIAL); return OscadTypes.RIGHT_ANGLE; }
+}
 
+{WHITE_SPACE_CHAR}+  {return TokenType.WHITE_SPACE;}
 <YYINITIAL> \"	{ yybegin(cond_string); }
 <cond_string> {
     \\n		|
@@ -96,4 +102,4 @@ E=[Ee][+-]?{D}+
 
 MODIFIER {return OscadTypes.MODIFIER;}
 }
-YYINITIAL . { return  TokenType.BAD_CHARACTER;}
+ . { return  TokenType.BAD_CHARACTER;}
