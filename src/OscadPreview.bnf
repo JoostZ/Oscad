@@ -15,11 +15,13 @@
 
   tokens=[
     COMMENT = 'regexp://.*(\n|$)'
+    STRING = 'regexp:\"[^\"]*\"'
     IMPORT = 'use'
     MODULE = 'module'
     FUNCTION = 'function'
     ASSIGN = 'assign'
-    SCALE = 'regexp:scale|rotate'
+    TRANSFORM_KEY = 'regexp:scale|rotate|translate|color'
+    CSG = 'regexp:difference|intersection|union'
 
     IF = 'if'
     ELSE = 'else'
@@ -36,7 +38,7 @@
     LEFT_SQUARE = '['
     RIGHT_SQUARE = ']'
 
-    ID='regexp:\p{Alpha}\w*'
+    ID='regexp:\$?\p{Alpha}\w*'
     NUMBER = 'regexp:\d+(\.\d*)?'
 
     COMPARATOR = '==' // Need to be extended with other comparison operators
@@ -50,11 +52,15 @@
     PLUS = '+'
     MINUS = '-'
   ]
+
+  name(".*expr")='expression'
+  extends(".*expr")=expr
 }
 
 oscadFile ::= item_*
 
 private item_ ::=
+    private COMMENT |
     use_or_include |
     module_declaration |
     function_declaration |
@@ -79,14 +85,15 @@ renderable_item ::=
     MODIFIER? transformed_item
 
 transformed_item ::=
-    transform+ LEFT_BRACE renderable_item+ RIGHT_BRACE |
-    transform* transformable_item
+    transform* transformable_item |
+    transform+ LEFT_BRACE renderable_item+ RIGHT_BRACE
 
 transformable_item ::=
+    CSG LEFT_PAREN RIGHT_PAREN LEFT_BRACE innerstatement+ RIGHT_BRACE |
     module_instantiation
 
 transform ::=
-    SCALE LEFT_PAREN arguments_call RIGHT_PAREN
+    TRANSFORM_KEY LEFT_PAREN arguments_call RIGHT_PAREN
 
 assign_statement ::=
     ASSIGN LEFT_PAREN assignment ( COMMA assignment)* RIGHT_PAREN
@@ -106,8 +113,12 @@ private primary ::= primary_inner factorial_expr ?
 left factorial_expr ::= '!'
 private primary_inner ::= function_instantiation | literal_expr | ref_expr | paren_expr
 paren_expr ::= LEFT_PAREN expr RIGHT_PAREN {pin=1}
-ref_expr ::= ID
-literal_expr ::= number | string | float
+ref_expr ::= unary_op?ID (LEFT_SQUARE expr RIGHT_SQUARE)?
+literal_expr ::= unary_op? NUMBER | STRING | float
+
+unary_op ::=
+    PLUS | MINUS
+
 
 module_declaration ::=
     MODULE ID LEFT_PAREN arguments_decl  RIGHT_PAREN statement
@@ -133,7 +144,7 @@ for_loop ::=
     FOR LEFT_PAREN iterator (COMMA iterator)* RIGHT_PAREN statement
 
 iterator ::=
-    ID EQUALS range_or_vector
+    ID EQUALS (range_or_vector | ID)
 
 range_or_vector ::=range | vector
 

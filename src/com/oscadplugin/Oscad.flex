@@ -59,14 +59,21 @@ E=[Ee][+-]?{D}+
 
 <YYINITIAL> {
 
-"module"	{ return OscadTypes.MODULE;}
+"module"	{return OscadTypes.MODULE;}
 "function"	{return OscadTypes.FUNCTION;}
 "if"		{return OscadTypes.IF;}
+"for"       {return OscadTypes.FOR;}
+"assign"    {return OscadTypes.ASSIGN;}
 "else"		{return OscadTypes.ELSE;}
 
-"true"		{return OscadTypes.TRUE;}
-"false"		{return OscadTypes.FALSE;}
-"undef"		{return OscadTypes.UNDEF;}
+"scale"     |
+"rotate"    |
+"translate" |
+"color"     {return OscadTypes.TRANSFORM_KEY;}
+
+"difference" |
+intersection |
+union       {return OscadTypes.CSG; }
 
 [-+]?{D}+{E}? |
 [-+]?{D}*\.{D}+{E}? |
@@ -78,8 +85,8 @@ E=[Ee][+-]?{D}+
 ")"     { return OscadTypes.RIGHT_PAREN; }
 "{"     { return OscadTypes.LEFT_BRACE; }
 "}"     { return OscadTypes.RIGHT_BRACE; }
-"["     { return OscadTypes.LEFT_SQUARE_BRACKET; }
-"]"     { return OscadTypes.RIGHT_SQUARE_BRACKET; }
+"["     { return OscadTypes.LEFT_SQUARE; }
+"]"     { return OscadTypes.RIGHT_SQUARE; }
 
 "="     { return OscadTypes.EQUALS; }
 
@@ -88,18 +95,17 @@ E=[Ee][+-]?{D}+
 "=="	|
 "!="	|
 "&&"	|
-"||"	{return OscadTypes.OPERATOR; }
-
-"*"     |
-"/"     |
-"+"     |
-"-"     {return OscadTypes.OPERATOR; }
+"||"	{return OscadTypes.COMPARATOR; }
 
 ";"     { return OscadTypes.SEMICOLON; }
 ":"     { return OscadTypes.COLON; }
 ","     { return OscadTypes.COMMA; }
+"*"     {return OscadTypes.STAR; }
+"/"     {return OscadTypes.SLASH; }
+"+"     {return OscadTypes.PLUS; }
+"-"     {return OscadTypes.MINUS; }
 
 
-MODIFIER {return OscadTypes.MODIFIER;}
+"!" {return OscadTypes.MODIFIER;}
 }
  . { return  TokenType.BAD_CHARACTER;}
