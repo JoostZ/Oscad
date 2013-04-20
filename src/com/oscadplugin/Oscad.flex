@@ -38,9 +38,9 @@ E=[Ee][+-]?{D}+
 "include" |
 "use"       {yybegin(cond_include); return OscadTypes.IMPORT; }
 <cond_include> {
-{WHITE_SPACE_CHAR}+  {}
+    {WHITE_SPACE_CHAR}*  {return TokenType.WHITE_SPACE;}
     "<"         { return OscadTypes.LEFT_ANGLE; }
-    [^\n><]*     { return OscadTypes.FILENAME; }
+    [^\n \t<>]+     { return OscadTypes.FILENAME; }
     ">"         { yybegin(YYINITIAL); return OscadTypes.RIGHT_ANGLE; }
 }
 
@@ -87,6 +87,8 @@ union       {return OscadTypes.CSG; }
 "}"     { return OscadTypes.RIGHT_BRACE; }
 "["     { return OscadTypes.LEFT_SQUARE; }
 "]"     { return OscadTypes.RIGHT_SQUARE; }
+"<"     { return OscadTypes.LEFT_ANGLE; }
+">"     { return OscadTypes.RIGHT_ANGLE; }
 
 "="     { return OscadTypes.EQUALS; }
 

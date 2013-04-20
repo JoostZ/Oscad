@@ -19,8 +19,8 @@
 
 oscadFile ::= item_*
 
-private item_ ::=
-    COMMENT
+item_ ::=
+    COMMENT |
     use_or_include |
     module_declaration |
     function_declaration |
@@ -28,8 +28,6 @@ private item_ ::=
 
 use_or_include ::=
     IMPORT LEFT_ANGLE FILENAME RIGHT_ANGLE
-
-FILENAME ::= ID
 
 statement ::=
     innerstatement |
