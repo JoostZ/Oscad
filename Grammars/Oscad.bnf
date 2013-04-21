@@ -8,6 +8,7 @@
   psiImplClassSuffix="Impl"
   psiPackage="com.oscadplugin.psi"
   psiImplPackage="com.oscadplugin.psi.impl"
+  psiImplUtilClass="com.oscadplugin.psi.impl.OscadPsiImplUtils"
 
   elementTypeHolderClass="com.oscadplugin.psi.OscadTypes"
   elementTypeClass="com.oscadplugin.psi.OscadElementType"
@@ -79,7 +80,7 @@ unary_op ::=
 
 
 module_declaration ::=
-    MODULE ID LEFT_PAREN arguments_decl  RIGHT_PAREN statement
+    MODULE ID LEFT_PAREN arguments_decl  RIGHT_PAREN statement {methods=[getModuleName]}
 
 function_declaration ::=
     FUNCTION ID LEFT_PAREN arguments_decl RIGHT_PAREN EQUALS expr SEMICOLON
@@ -119,7 +120,7 @@ compare_expression ::=
     expr COMPARATOR expr
 
 module_instantiation ::=
-	ID LEFT_PAREN arguments_call RIGHT_PAREN SEMICOLON
+	ID LEFT_PAREN arguments_call RIGHT_PAREN SEMICOLON {methods=[getModuleDeclaration getModuleName]}
 
 function_instantiation ::= ID LEFT_PAREN arguments_call RIGHT_PAREN
 

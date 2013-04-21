@@ -42,6 +42,8 @@
       <lang.parserDefinition language="Oscad" implementationClass="com.oscadplugin.OscadParserDefinition"/>
       <lang.syntaxHighlighterFactory key="Oscad" implementationClass="com.oscadplugin.OscadSyntaxHighlighterFactory"/>
       <colorSettingsPage implementation="com.oscadplugin.OscadColorSettingsPage"/>
+
+      <annotator language="Oscad" implementationClass="com.oscadplugin.annotator.OscadAnnotator"/>
     <!-- Add your extensions here -->
   </extensions>
 </idea-plugin>
