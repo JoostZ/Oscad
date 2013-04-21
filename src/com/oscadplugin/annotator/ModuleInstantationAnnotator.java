@@ -37,7 +37,9 @@ public class ModuleInstantationAnnotator implements Annotator {
             declaration = OscadPsiImplUtils.getModuleDeclaration(instantiation);
         }
         if (declaration == null) {
-            holder.createErrorAnnotation(element.getTextRange(), "Unresolved property");
+            TextRange range = new TextRange(element.getTextRange().getStartOffset(),
+                    element.getTextRange().getStartOffset() + name.length());
+            holder.createErrorAnnotation(range, "Unknown module");
         }
     }
 }
