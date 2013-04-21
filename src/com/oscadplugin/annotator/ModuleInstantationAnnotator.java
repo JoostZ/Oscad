@@ -4,6 +4,7 @@ import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.oscadplugin.psi.BuiltinSolid;
 import com.oscadplugin.psi.OscadModuleDeclaration;
 import com.oscadplugin.psi.OscadModuleInstantiation;
 import com.oscadplugin.psi.impl.OscadPsiImplUtils;
@@ -30,7 +31,11 @@ public class ModuleInstantationAnnotator implements Annotator {
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
         OscadModuleInstantiation instantiation = (OscadModuleInstantiation) element;
         String name = instantiation.getModuleName();
-        OscadModuleDeclaration declaration = OscadPsiImplUtils.getModuleDeclaration(instantiation);
+        OscadModuleDeclaration declaration = BuiltinSolid.create(instantiation);
+
+        if (declaration == null) {
+            declaration = OscadPsiImplUtils.getModuleDeclaration(instantiation);
+        }
         if (declaration == null) {
             holder.createErrorAnnotation(element.getTextRange(), "Unresolved property");
         }
