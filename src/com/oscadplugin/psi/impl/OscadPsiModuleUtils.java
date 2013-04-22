@@ -2,15 +2,16 @@ package com.oscadplugin.psi.impl;
 
 import com.intellij.lang.ASTNode;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiRecursiveElementVisitor;
 import com.intellij.psi.tree.TokenSet;
-import com.intellij.psi.util.PsiTreeUtil;
 import com.oscadplugin.psi.OscadModuleDeclaration;
 import com.oscadplugin.psi.OscadModuleInstantiation;
 import com.oscadplugin.psi.OscadTypes;
+import com.oscadplugin.psi.OscadUseOrInclude;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,10 +24,65 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class OscadPsiModuleUtils {
+    private static final String LIB_PATH = "C:/Program Files/OpenSCAD/libraries";
+
     public static OscadModuleDeclaration getModuleDeclaration(OscadModuleInstantiation element) {
         final String instantiationName = element.getModuleName();
-        final OscadModuleDeclaration[] declaration = {null};
         PsiFile file = element.getContainingFile();
+        OscadModuleDeclaration declaration = getModuleFromFile(instantiationName, file);
+
+        if (declaration != null) {
+            return declaration;
+        }
+
+        List<OscadUseOrInclude> importFiles = findImports(file);
+        for (OscadUseOrInclude importFile : importFiles) {
+            ASTNode[] children = importFile.getNode().getChildren(TokenSet.create(OscadTypes.FILENAME));
+            if (children == null || children.length == 0) {
+                continue;
+            }
+            PsiFile fileToInclude = findFile(children[0].getText(), element);
+            if (fileToInclude != null) {
+                declaration = getModuleFromFile(instantiationName, fileToInclude);
+                if (declaration != null) {
+                    return declaration;
+                }
+            }
+        }
+
+        return declaration;
+    }
+
+    private static PsiFile findFile(String name, PsiElement element) {
+        Project project = element.getProject();
+        PsiFile file = element.getContainingFile().getContainingDirectory().findFile(name);
+        if (file != null) {
+            return file;
+        }
+
+        String resourceFile = LIB_PATH + "/" + name;
+
+        VirtualFile vf = project.getBaseDir().getFileSystem().findFileByPath(resourceFile);
+        return PsiManager.getInstance(project).findFile(vf);
+    }
+
+    private static List<OscadUseOrInclude> findImports(PsiFile file) {
+        final List<OscadUseOrInclude> result = new ArrayList<OscadUseOrInclude>();
+
+        file.accept(new PsiRecursiveElementVisitor() {
+            @Override
+            public void visitElement(PsiElement element) {
+                super.visitElement(element);
+                if (element instanceof OscadUseOrInclude) {
+                    result.add((OscadUseOrInclude) element);
+                }
+            }
+        });
+        return result;
+    }
+
+    private static OscadModuleDeclaration getModuleFromFile(final String instantiationName, PsiFile file) {
+        final OscadModuleDeclaration[] declaration = {null};
         file.accept(new PsiRecursiveElementVisitor() {
             @Override
             public void visitElement(PsiElement element) {
@@ -40,7 +96,6 @@ public class OscadPsiModuleUtils {
                 }
             }
         });
-
         return declaration[0];
     }
 
