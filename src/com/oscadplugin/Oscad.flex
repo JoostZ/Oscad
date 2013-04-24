@@ -66,6 +66,7 @@ E=[Ee][+-]?{D}+
 "assign"    {return OscadTypes.ASSIGN;}
 "else"		{return OscadTypes.ELSE;}
 
+"linear_extrude" |
 "scale"     |
 "rotate"    |
 "translate" |
@@ -75,9 +76,9 @@ E=[Ee][+-]?{D}+
 intersection |
 union       {return OscadTypes.CSG; }
 
-[-+]?{D}+{E}? |
-[-+]?{D}*\.{D}+{E}? |
-[-+]?{D}+\.{D}*{E}?          {  return OscadTypes.NUMBER; }
+{D}+{E}? |
+{D}*\.{D}+{E}? |
+{D}+\.{D}*{E}?          {  return OscadTypes.NUMBER; }
 
 "$"?[a-zA-Z0-9_]+       {  return OscadTypes.ID; }
 
@@ -106,6 +107,7 @@ union       {return OscadTypes.CSG; }
 "/"     {return OscadTypes.SLASH; }
 "+"     {return OscadTypes.PLUS; }
 "-"     {return OscadTypes.MINUS; }
+"%"     {return OscadTypes.PERCENT; }
 
 
 "!" {return OscadTypes.MODIFIER;}

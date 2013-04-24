@@ -1,6 +1,5 @@
 package com.oscadplugin.psi;
 
-import com.intellij.lang.ASTNode;
 import com.oscadplugin.psi.impl.OscadModuleDeclarationImpl;
 
 /**
@@ -13,16 +12,26 @@ import com.oscadplugin.psi.impl.OscadModuleDeclarationImpl;
 public class BuiltinSolid extends OscadModuleDeclarationImpl {
     private String solidName = null;
 
+    private static String[] solids = {
+            "cube",
+            "cylinder",
+            "sphere",
+            "circle",
+            "polygon",
+            "hexagon"
+    };
+
     public BuiltinSolid(OscadModuleInstantiation element) {
         super(element.getNode());
         solidName = element.getModuleName();
     }
 
     public static OscadModuleDeclaration create(OscadModuleInstantiation element) {
-        if ("cube".equals(element.getModuleName())) {
-            return new BuiltinSolid(element);
-        } else if ("cylinder".equals(element.getModuleName())) {
-            return new BuiltinSolid(element);
+        String name = element.getModuleName();
+        for (String solid : solids) {
+            if (solid.equals(name)) {
+                return new BuiltinSolid(element);
+            }
         }
         return null;
     }

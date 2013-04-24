@@ -51,6 +51,7 @@
     SLASH = '/'
     PLUS = '+'
     MINUS = '-'
+    PERCENT ='%'
   ]
 
   name(".*expr")='expression'
@@ -108,10 +109,10 @@ left plus_expr ::= plus_op factor
 private plus_op ::= PLUS | MINUS
 private factor ::= primary mul_expr *
 left mul_expr  ::= mul_op primary
-private mul_op ::= STAR | SLASH
+private mul_op ::= STAR | SLASH | PERCENT
 private primary ::= primary_inner factorial_expr ?
 left factorial_expr ::= '!'
-private primary_inner ::= function_instantiation | literal_expr | ref_expr | paren_expr
+private primary_inner ::= function_instantiation | literal_expr | ref_expr | paren_expr | vector
 paren_expr ::= LEFT_PAREN expr RIGHT_PAREN {pin=1}
 ref_expr ::= unary_op?ID (LEFT_SQUARE expr RIGHT_SQUARE)?
 literal_expr ::= unary_op? NUMBER | STRING | float
@@ -148,8 +149,8 @@ iterator ::=
 
 range_or_vector ::=range | vector
 
-range ::=  LEFT_SQUARE expr (COLON expr)?  COLON expr RIGHT_SQUARE
-vector ::=  LEFT_SQUARE expr (COMMA expr) + RIGHT_SQUARE
+range ::=  LEFT_SQUARE expr COLON expr (COLON expr)? RIGHT_SQUARE
+vector ::=  LEFT_SQUARE expr (COMMA expr)+ RIGHT_SQUARE
 
 if_statement ::=
 	IF LEFT_PAREN compare_expression RIGHT_PAREN statement
@@ -158,7 +159,7 @@ ifelse_statement ::=
 	if_statement ( ELSE statement ) ?
 
 compare_expression ::=
-    expr COMPARATOR expr
+    expr (COMPARATOR expr)?
 
 module_instantiation ::=
 	ID LEFT_PAREN arguments_call RIGHT_PAREN SEMICOLON

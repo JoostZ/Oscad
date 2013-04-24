@@ -61,9 +61,8 @@ public class OscadPsiModuleUtils {
         }
 
         String resourceFile = LIB_PATH + "/" + name;
-
-        VirtualFile vf = project.getBaseDir().getFileSystem().findFileByPath(resourceFile);
-        return PsiManager.getInstance(project).findFile(vf);
+        VirtualFile foundFile = project.getBaseDir().getFileSystem().findFileByPath(resourceFile);
+        return PsiManager.getInstance(project).findFile(foundFile);
     }
 
     private static List<OscadUseOrInclude> findImports(PsiFile file) {
@@ -86,7 +85,6 @@ public class OscadPsiModuleUtils {
         file.accept(new PsiRecursiveElementVisitor() {
             @Override
             public void visitElement(PsiElement element) {
-                super.visitElement(element);
                 if (element instanceof OscadModuleDeclaration) {
                     OscadModuleDeclaration moduleDeclaration = (OscadModuleDeclaration) element;
                     String id = moduleDeclaration.getModuleName();
@@ -94,6 +92,7 @@ public class OscadPsiModuleUtils {
                         declaration[0] = moduleDeclaration;
                     }
                 }
+                super.visitElement(element);
             }
         });
         return declaration[0];
