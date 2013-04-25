@@ -2,6 +2,7 @@ package com.oscadplugin.annotator;
 
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
+import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.oscadplugin.psi.BuiltinSolid;
@@ -39,7 +40,8 @@ public class ModuleInstantationAnnotator implements Annotator {
         if (declaration == null) {
             TextRange range = new TextRange(element.getTextRange().getStartOffset(),
                     element.getTextRange().getStartOffset() + name.length());
-            holder.createErrorAnnotation(range, "Unknown module");
+            holder.createErrorAnnotation(range, "Unknown module").
+                    setTextAttributes(CodeInsightColors.WRONG_REFERENCES_ATTRIBUTES);
         }
     }
 }
