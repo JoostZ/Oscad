@@ -8,6 +8,7 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiManager;
 import com.intellij.psi.PsiRecursiveElementVisitor;
 import com.intellij.psi.tree.TokenSet;
+import com.oscadplugin.Module;
 import com.oscadplugin.psi.OscadModuleDeclaration;
 import com.oscadplugin.psi.OscadModuleInstantiation;
 import com.oscadplugin.psi.OscadTypes;
@@ -26,10 +27,10 @@ import java.util.List;
 public class OscadPsiModuleUtils {
     private static final String LIB_PATH = "C:/Program Files/OpenSCAD/libraries";
 
-    public static OscadModuleDeclaration getModuleDeclaration(OscadModuleInstantiation element) {
+    public static Module getModuleDeclaration(OscadModuleInstantiation element) {
         final String instantiationName = element.getModuleName();
         PsiFile file = element.getContainingFile();
-        OscadModuleDeclaration declaration = getModuleFromFile(instantiationName, file);
+        Module declaration = getModuleFromFile(instantiationName, file);
 
         if (declaration != null) {
             return declaration;
@@ -80,7 +81,7 @@ public class OscadPsiModuleUtils {
         return result;
     }
 
-    private static OscadModuleDeclaration getModuleFromFile(final String instantiationName, PsiFile file) {
+    private static Module getModuleFromFile(final String instantiationName, PsiFile file) {
         final OscadModuleDeclaration[] declaration = {null};
         file.accept(new PsiRecursiveElementVisitor() {
             @Override
@@ -95,7 +96,7 @@ public class OscadPsiModuleUtils {
                 super.visitElement(element);
             }
         });
-        return declaration[0];
+        return new Module(declaration[0]);
     }
 
     public static String getModuleName(PsiElement element) {

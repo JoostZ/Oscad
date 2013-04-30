@@ -5,8 +5,8 @@ import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.oscadplugin.CallableItem;
 import com.oscadplugin.psi.BuiltinSolid;
-import com.oscadplugin.psi.OscadModuleDeclaration;
 import com.oscadplugin.psi.OscadModuleInstantiation;
 import com.oscadplugin.psi.impl.OscadPsiImplUtils;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +32,7 @@ public class ModuleInstantationAnnotator implements Annotator {
     public void annotate(@NotNull PsiElement element, @NotNull AnnotationHolder holder) {
         OscadModuleInstantiation instantiation = (OscadModuleInstantiation) element;
         String name = instantiation.getModuleName();
-        OscadModuleDeclaration declaration = BuiltinSolid.create(instantiation);
+        CallableItem declaration = BuiltinSolid.create(instantiation);
 
         if (declaration == null) {
             declaration = OscadPsiImplUtils.getModuleDeclaration(instantiation);

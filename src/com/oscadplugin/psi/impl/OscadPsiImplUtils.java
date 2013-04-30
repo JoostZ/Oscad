@@ -1,10 +1,8 @@
 package com.oscadplugin.psi.impl;
 
-import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiElement;
-import com.oscadplugin.psi.OscadModuleDeclaration;
+import com.oscadplugin.Module;
 import com.oscadplugin.psi.OscadModuleInstantiation;
-import com.oscadplugin.psi.OscadTypes;
 
 /**
  * Helper and Utility methods for Oscad PSI elements
@@ -18,7 +16,7 @@ import com.oscadplugin.psi.OscadTypes;
  * Grammar-kit has now generated calls to the static methods in this class in the generated classes.
  */
 public class OscadPsiImplUtils {
-    public static OscadModuleDeclaration getModuleDeclaration(OscadModuleInstantiation element) {
+    public static Module getModuleDeclaration(OscadModuleInstantiation element) {
         return OscadPsiModuleUtils.getModuleDeclaration(element);
     }
 

@@ -1,6 +1,6 @@
 package com.oscadplugin.psi;
 
-import com.oscadplugin.psi.impl.OscadModuleDeclarationImpl;
+import com.oscadplugin.CallableItem;
 
 /**
  * Created with IntelliJ IDEA.
@@ -9,7 +9,7 @@ import com.oscadplugin.psi.impl.OscadModuleDeclarationImpl;
  * Time: 19:21
  * To change this template use File | Settings | File Templates.
  */
-public class BuiltinSolid extends OscadModuleDeclarationImpl {
+public class BuiltinSolid implements CallableItem {
     private String solidName = null;
 
     private static String[] solids = {
@@ -21,18 +21,22 @@ public class BuiltinSolid extends OscadModuleDeclarationImpl {
             "hexagon"
     };
 
-    public BuiltinSolid(OscadModuleInstantiation element) {
-        super(element.getNode());
-        solidName = element.getModuleName();
+    public BuiltinSolid(String name) {
+        solidName = name;
     }
 
-    public static OscadModuleDeclaration create(OscadModuleInstantiation element) {
+    public static CallableItem create(OscadModuleInstantiation element) {
         String name = element.getModuleName();
         for (String solid : solids) {
             if (solid.equals(name)) {
-                return new BuiltinSolid(element);
+                return new BuiltinSolid(name);
             }
         }
         return null;
+    }
+
+    @Override
+    public String getName() {
+        return solidName;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }
