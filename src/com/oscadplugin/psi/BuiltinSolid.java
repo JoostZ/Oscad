@@ -1,5 +1,6 @@
 package com.oscadplugin.psi;
 
+import com.oscadplugin.Arguments;
 import com.oscadplugin.CallableItem;
 
 /**
@@ -38,5 +39,10 @@ public class BuiltinSolid implements CallableItem {
     @Override
     public String getName() {
         return solidName;  //To change body of implemented methods use File | Settings | File Templates.
+    }
+
+    @Override
+    public Arguments getArguments() {
+        return null;  //To change body of implemented methods use File | Settings | File Templates.
     }
 }

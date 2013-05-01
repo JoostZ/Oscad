@@ -11,12 +11,20 @@ import com.oscadplugin.psi.OscadModuleDeclaration;
  */
 public class Module implements CallableItem {
     private final OscadModuleDeclaration element;
+    private Arguments args;
+
 
     public Module(OscadModuleDeclaration element) {
         this.element = element;
+        args = element.getArguments();
     }
     @Override
     public String getName() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        return element.getModuleName();
+    }
+
+    @Override
+    public Arguments getArguments() {
+        return args;
     }
 }

@@ -96,6 +96,9 @@ public class OscadPsiModuleUtils {
                 super.visitElement(element);
             }
         });
+        if (declaration.length == 0 || declaration[0] == null) {
+            return null;
+        }
         return new Module(declaration[0]);
     }
 

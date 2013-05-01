@@ -80,21 +80,22 @@ unary_op ::=
 
 
 module_declaration ::=
-    MODULE ID LEFT_PAREN arguments_decl  RIGHT_PAREN statement {methods=[getModuleName]}
+    MODULE ID LEFT_PAREN arguments_decl  RIGHT_PAREN statement {methods=[getModuleName getArguments]}
 
 function_declaration ::=
     FUNCTION ID LEFT_PAREN arguments_decl RIGHT_PAREN EQUALS expr SEMICOLON
 
 arguments_decl ::=
-    argument? (COMMA argument?)*
+    argument? (COMMA argument?)* {methods=[getArguments]}
 
 argument ::=
-	ID  (EQUALS expr) ?
+    ID  (EQUALS expr) ? {methods=[getArgument]}
 
 arguments_call ::=
     argument_call ? (COMMA argument_call) *
 
-argument_call ::= (ID EQUALS)? expr
+argument_call ::= (parName EQUALS)? expr
+parName ::= ID
 
 optional_commas ::=
 	COMMA*

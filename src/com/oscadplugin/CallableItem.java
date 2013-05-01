@@ -9,4 +9,5 @@ package com.oscadplugin;
  */
 public interface CallableItem {
     public String getName();
+    public Arguments getArguments();
 }
