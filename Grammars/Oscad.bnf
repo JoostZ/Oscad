@@ -89,7 +89,7 @@ arguments_decl ::=
     argument? (COMMA argument?)* {methods=[getArguments]}
 
 argument ::=
-    ID  (EQUALS expr) ? {methods=[getArgument]}
+    parName  (EQUALS parVal) ?
 
 arguments_call ::=
     argument_call ? (COMMA argument_call) *
