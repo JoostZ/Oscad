@@ -48,6 +48,28 @@ public class OscadPsiImplUtils {
                     result.add(new Argument(name, val)) ;
                 }
             }
+        } else if (element instanceof OscadModuleInstantiation) {
+            OscadModuleInstantiation module = (OscadModuleInstantiation) element;
+            OscadArgumentsCall argumentsCall = module.getArgumentsCall();
+            if (argumentsCall != null) {
+                // There are arguments
+                List<OscadArgumentCall> argumentCallList = argumentsCall.getArgumentCallList();
+                for (OscadArgumentCall arg :argumentCallList) {
+                    String name = null;
+                    String val = null;
+                    if (arg.getParName() != null) {
+                        val = arg.getParName().getText();
+                    }
+                    if (arg.getParVal() != null) {
+                        val = arg.getParVal().getText();
+                    }
+                    if (name == null && val == null) {
+                        result.add(null);
+                    } else {
+                        result.add(new Argument(name, val)) ;
+                    }
+                }
+            }
         }
         return result;
     }

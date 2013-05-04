@@ -94,8 +94,9 @@ argument ::=
 arguments_call ::=
     argument_call ? (COMMA argument_call) *
 
-argument_call ::= (parName EQUALS)? expr
+argument_call ::= ((parName EQUALS)? parVal)?
 parName ::= ID
+parVal ::= expr
 
 optional_commas ::=
 	COMMA*
@@ -121,7 +122,7 @@ compare_expression ::=
     expr (COMPARATOR expr)?
 
 module_instantiation ::=
-	ID LEFT_PAREN arguments_call RIGHT_PAREN SEMICOLON {methods=[getModuleDeclaration getModuleName]}
+	ID LEFT_PAREN arguments_call RIGHT_PAREN SEMICOLON {methods=[getArguments getModuleName]}
 
 function_instantiation ::= ID LEFT_PAREN arguments_call RIGHT_PAREN
 

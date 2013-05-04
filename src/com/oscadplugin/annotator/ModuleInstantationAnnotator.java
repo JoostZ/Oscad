@@ -5,13 +5,12 @@ import com.intellij.lang.annotation.Annotator;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.oscadplugin.Argument;
+import com.oscadplugin.Arguments;
 import com.oscadplugin.CallableItem;
-import com.oscadplugin.psi.*;
+import com.oscadplugin.psi.BuiltinSolid;
+import com.oscadplugin.psi.OscadModuleInstantiation;
 import com.oscadplugin.psi.impl.OscadPsiImplUtils;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
 
 /**
  * Created with IntelliJ IDEA.
@@ -46,17 +45,9 @@ public class ModuleInstantationAnnotator implements Annotator {
                     setTextAttributes(CodeInsightColors.WRONG_REFERENCES_ATTRIBUTES);
         } else {
             String moduleName = declaration.getName();
-            OscadArgumentsCall argumentsCall = instantiation.getArgumentsCall();
-            List<OscadArgumentCall> argumentCallList = argumentsCall.getArgumentCallList();
-            for (OscadArgumentCall arg : argumentCallList) {
-                String argName = null;
-                String val = null;
-                OscadParName parName = arg.getParName();
-                if (parName != null) {
-                    argName = parName.getText();
-                }
-                val = arg.getExpr().getText();
-                new Argument(argName, val);
+            Arguments callArgs =  instantiation.getArguments();
+            if (Arguments.Match(callArgs, declaration.getArguments())) {
+
             }
         }
     }
