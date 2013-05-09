@@ -43,6 +43,7 @@ public class BuiltinSolid implements CallableItem {
 
     @Override
     public Arguments getArguments() {
-        return null;  //To change body of implemented methods use File | Settings | File Templates.
+        // TDO: Return the actual arguments
+        return new Arguments();
     }
 }

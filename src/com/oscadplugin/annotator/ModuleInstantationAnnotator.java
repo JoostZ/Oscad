@@ -7,9 +7,11 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.oscadplugin.Arguments;
 import com.oscadplugin.CallableItem;
+import com.oscadplugin.Module;
 import com.oscadplugin.psi.BuiltinSolid;
+import com.oscadplugin.psi.CallableReference;
+import com.oscadplugin.psi.OscadModuleDeclaration;
 import com.oscadplugin.psi.OscadModuleInstantiation;
-import com.oscadplugin.psi.impl.OscadPsiImplUtils;
 import org.jetbrains.annotations.NotNull;
 
 /**
@@ -36,7 +38,10 @@ public class ModuleInstantationAnnotator implements Annotator {
         CallableItem declaration = BuiltinSolid.create(instantiation);
 
         if (declaration == null) {
-            declaration = OscadPsiImplUtils.getModuleDeclaration(instantiation);
+            OscadModuleDeclaration reference = (OscadModuleDeclaration) new CallableReference(instantiation).resolve();
+            if (reference != null) {
+                declaration = new Module(reference);
+            }
         }
         if (declaration == null) {
             TextRange range = new TextRange(element.getTextRange().getStartOffset(),
@@ -44,7 +49,14 @@ public class ModuleInstantationAnnotator implements Annotator {
             holder.createErrorAnnotation(range, "Unknown module").
                     setTextAttributes(CodeInsightColors.WRONG_REFERENCES_ATTRIBUTES);
         } else {
-            String moduleName = declaration.getName();
+            TextRange range = new TextRange(element.getTextRange().getStartOffset(),
+                    element.getTextRange().getStartOffset() + name.length());
+            Arguments declArgs = declaration.getArguments();
+            try {
+                holder.createInfoAnnotation(range, declaration.getArguments().toString());
+            } catch (Exception e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
             Arguments callArgs =  instantiation.getArguments();
             if (Arguments.Match(callArgs, declaration.getArguments())) {
 
