@@ -3,7 +3,6 @@ package com.oscadplugin.psi.impl;
 import com.intellij.psi.PsiElement;
 import com.oscadplugin.Argument;
 import com.oscadplugin.Arguments;
-import com.oscadplugin.Module;
 import com.oscadplugin.psi.*;
 
 import java.util.List;
@@ -20,9 +19,6 @@ import java.util.List;
  * Grammar-kit has now generated calls to the static methods in this class in the generated classes.
  */
 public class OscadPsiImplUtils {
-    public static Module getModuleDeclaration(OscadModuleInstantiation element) {
-        return OscadPsiModuleUtils.getModuleDeclaration(element);
-    }
 
     public static String getModuleName(PsiElement element) {
         return OscadPsiModuleUtils.getModuleName(element);
